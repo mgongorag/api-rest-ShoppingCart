@@ -50,30 +50,40 @@ END
 	Fecha Creacion 11/22/2020
 	Autor: Miguel Gongora
 */
-DROP PROCEDURE guardarCliente
-CREATE PROCEDURE guardarCliente (
+
+DROP PROCEDURE SPRegistroCliente
+CREATE PROCEDURE SPRegistroCliente (
 									@_nombre			NVARCHAR(50),
 									@_apellido			NVARCHAR(50),
 									@_fechaNacimiento	DATE,
 									@_email				NVARCHAR(100),
 									@_password			NVARCHAR(256),
 									@_telefono			NVARCHAR(8),
-									@_telefono2			NVARCHAR(8) 
+									@_telefono2			NVARCHAR(8) = NULL,
+									@_token				NVARCHAR(256)
 									)
 AS
 	DECLARE @_idCliente		INT,
 			@_estado		BIT,
 			@_message		NVARCHAR(100),
 			@_codigoError	INT,
-			@_messageError	NVARCHAR(100),
+			@_messageError	NVARCHAR(250),
 			@_ultimoId		INT,
-			@_filasAfectadas INT
+			@_filasAfectadas INT, 
+			@_idToken		INT,
+			@_expiration	INT;
 BEGIN
 	
 	BEGIN TRANSACTION
 		SELECT @_ultimoId = ISNULL(MAX(id_cliente), 0)
 		FROM Cliente;
 		SET @_estado = 0;
+
+		SELECT @_idToken = ISNULL(MAX(id_token),0)
+		FROM TokenCliente;
+
+		SELECT @_expiration = CAST(valor AS INTEGER) FROM Parametros;
+
 		BEGIN TRY
 			INSERT INTO Cliente ( 
 									id_cliente,
@@ -100,6 +110,26 @@ BEGIN
 									@_telefono2
 								);
 			SET @_filasAfectadas = @@ROWCOUNT;
+
+			INSERT INTO TokenCliente	(
+										id_token,
+										token,
+										expiracion,
+										id_cliente,
+										fechaIngreso,
+										estado
+										)
+			VALUES						(
+										@_idToken + 1,
+										@_token,
+										@_expiration,
+										@_ultimoId + 1,
+										GETDATE(),
+										1
+										);
+
+		SET @_filasAfectadas += @@ROWCOUNT;
+
 		END TRY
 		BEGIN CATCH
 			SET @_messageError = ERROR_MESSAGE();
@@ -112,8 +142,11 @@ BEGIN
 		IF @_filasAfectadas > 0
 			BEGIN
 				SET @_estado = 1;
-				SET @_message = 'Cliente agregado exitosamente';
-				SELECT @_estado AS Estado, @_message AS Message, @_filasAfectadas AS Filas_Afectadas;
+				SET @_message = 'Registro realizado exitosamente';
+				SELECT @_estado AS Estado, 
+					   @_message AS Message, 
+					   @_filasAfectadas AS Filas_Afectadas,
+					   @_token AS Token;
 				COMMIT;
 			END
 		ELSE
@@ -121,7 +154,8 @@ BEGIN
 				SELECT	@_estado AS Estado, 
 						@_message AS Message, 
 						@_messageError AS Message_Error, 
-						@_codigoError AS Number_error;
+						@_codigoError AS Number_error,
+						NULL AS Token
 						ROLLBACK;
 			END
 END
@@ -255,5 +289,41 @@ BEGIN
 		END
 END
 
+/*
+	Funcion Verificar el estado del token
+	Fecha Creacion 11/24/2020
+	Autor: Miguel Gongora
+*/
+CREATE FUNCTION VerificarEstadoToken	(
+											@_token NVARCHAR(256)
+										)
+RETURNS BIT
+AS 
+BEGIN
+	DECLARE @_Resultado				BIT,
+			@_fechaYHoraCreacion	DATETIME,
+			@_vigenciaMinutos		INT,
+			@_tiempoSinUso			DATETIME;
 
+		SELECT @_fechaYHoraCreacion = t.fechaIngreso 
+		FROM TokenCliente t
+		WHERE token = @_token 
+		AND estado = 1;
+
+		SELECT @_vigenciaMinutos = CAST(valor AS INTEGER) 
+		FROM Parametros 
+		where id_parametro = 1;
+
+		SET @_tiempoSinUso = DATEDIFF(MINUTE, @_fechaYHoraCreacion, GETDATE());
+
+		IF(@_tiempoSinUso > @_vigenciaMinutos) 
+			BEGIN
+				SET @_Resultado = 0;
+			END
+		ELSE
+			BEGIN
+				SET @_Resultado = 1
+			END
+	RETURN @_Resultado;
+END
 

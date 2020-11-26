@@ -32,6 +32,16 @@ CREATE TABLE Cliente (
 	CONSTRAINT id_clientePK PRIMARY KEY (id_cliente)
 	)
 
+CREATE TABLE TokenCliente (
+	id_token			INT NOT NULL,
+	token			NVARCHAR(256) NOT NULL,
+	expiracion		INT NOT NULL,
+	id_cliente		INT NOT NULL,
+	fechaIngreso	DATETIME NOT NULL,
+	estado			BIT DEFAULT 1,
+	CONSTRAINT idTokenclientePK PRIMARY KEY (id_token),
+	FOREIGN KEY (id_cliente) REFERENCES Cliente(id_cliente)
+	)
 
 CREATE TABLE DireccionesEnvio (
 	id_direccion	INT NOT NULL,
@@ -43,4 +53,14 @@ CREATE TABLE DireccionesEnvio (
 	CONSTRAINT id_direccionPK PRIMARY KEY (id_direccion),
 	FOREIGN KEY (id_municipio) REFERENCES Municipio(id_municipio),
 	FOREIGN KEY (id_cliente) REFERENCES Cliente(id_cliente)
+	);
+
+CREATE TABLE Parametros(
+	id_parametro INT NOT NULL,
+	parametro NVARCHAR(50) NOT NULL,
+	valor NVARCHAR(50) NOT NULL,
+	descripcion NVARCHAR(100) NOT NULL,
+	llave NVARCHAR(20) NOT NULL UNIQUE,
+	CONSTRAINT id_parametroPK PRIMARY KEY (id_parametro)
 	)
+
