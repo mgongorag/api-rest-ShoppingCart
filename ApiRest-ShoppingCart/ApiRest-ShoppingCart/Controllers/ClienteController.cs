@@ -16,5 +16,12 @@ namespace ApiRest_ShoppingCart.Controllers
         {
             return Models.DataCliente.registrarUsuario(cliente);
         }
+
+        [HttpPost]
+        [Route("api/LoginCliente")]
+        public DataTable login(Entidades.LoginValidate loginValidate)
+        {
+            return Models.DataCliente.loginCliente(loginValidate);
+        }
     }
 }
