@@ -28,5 +28,16 @@ namespace ApiRest_ShoppingCart.Models
             return  Conexion.execCommandSelect(command);
 
         }
+
+        public static DataTable loginCliente(Entidades.LoginValidate loginValidate)
+        {
+            SqlCommand command = Conexion.commandSP("SPLoginCliente");
+            command.Parameters.AddWithValue("@_email", loginValidate.email);
+            command.Parameters.AddWithValue("@_password", Funciones.EncriptarSHA512(loginValidate.password));
+            command.Parameters.AddWithValue("@_token", Funciones.getTokenSession());
+
+            return Conexion.execCommandSelect(command);
+
+        }
     }
 }
