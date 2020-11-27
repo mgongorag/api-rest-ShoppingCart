@@ -78,5 +78,29 @@ namespace ApiRest_ShoppingCart.Models
             return dt;
         }
 
+
+
+        public static DataTable retornarException(Entidades.Excepcion excepcion)
+        {
+
+            DataRow row = dt.NewRow();
+            dt.Clear();
+            dt.Reset();
+            
+
+            dt.Columns.Add("estado", typeof(bool));
+            dt.Columns.Add("message", typeof(string));
+            dt.Columns.Add("errorMessage", typeof(string));
+
+            row["estado"] = excepcion.estado;
+            row["message"] = excepcion.message;
+            row["errorMessage"] = excepcion.errorMessage;
+
+
+            dt.Rows.Add(row);
+            return dt;
+
+        }
+
     }
 }

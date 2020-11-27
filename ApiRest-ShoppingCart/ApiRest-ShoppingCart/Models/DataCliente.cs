@@ -12,32 +12,53 @@ namespace ApiRest_ShoppingCart.Models
         private static Funciones function = new Funciones();
         private static DataTable dt = new DataTable();
         private static int estado = 0;
+        private static Entidades.Excepcion excepcion = new Entidades.Excepcion();
 
         public static DataTable registrarUsuario(Entidades.Cliente cliente)
         {
-            SqlCommand command = Conexion.commandSP("SPRegistroCliente");
-            command.Parameters.AddWithValue("@_nombre", cliente.nombre);
-            command.Parameters.AddWithValue("@_apellido", cliente.apellidos);
-            command.Parameters.AddWithValue("@_fechaNacimiento", cliente.fechaNacimiento);
-            command.Parameters.AddWithValue("@_email", cliente.email);
-            command.Parameters.AddWithValue("@_password", Funciones.EncriptarSHA512(cliente.password));
-            command.Parameters.AddWithValue("@_telefono", cliente.telefono);
-            command.Parameters.AddWithValue("@_telefono2", cliente.telefono2);
-            command.Parameters.AddWithValue("@_token", Funciones.getTokenSession());
+            try
+            {
+                SqlCommand command = Conexion.commandSP("SPRegistroCliente");
+                command.Parameters.AddWithValue("@_nombre", cliente.nombre);
+                command.Parameters.AddWithValue("@_apellido", cliente.apellidos);
+                command.Parameters.AddWithValue("@_fechaNacimiento", cliente.fechaNacimiento);
+                command.Parameters.AddWithValue("@_email", cliente.email);
+                command.Parameters.AddWithValue("@_password", Funciones.EncriptarSHA512(cliente.password));
+                command.Parameters.AddWithValue("@_telefono", cliente.telefono);
+                command.Parameters.AddWithValue("@_telefono2", cliente.telefono2);
+                command.Parameters.AddWithValue("@_token", Funciones.getTokenSession());
 
-            return  Conexion.execCommandSelect(command);
+                dt = Conexion.execCommandSelect(command);
+            }catch(Exception ex)
+            {
+                excepcion.estado = false;
+                excepcion.message = "Ha ocurrido un error";
+                excepcion.errorMessage = ex.Message;
+                dt = Funciones.retornarException(excepcion);
+            }
 
+            return dt;
         }
 
         public static DataTable loginCliente(Entidades.LoginValidate loginValidate)
         {
-            SqlCommand command = Conexion.commandSP("SPLoginCliente");
-            command.Parameters.AddWithValue("@_email", loginValidate.email);
-            command.Parameters.AddWithValue("@_password", Funciones.EncriptarSHA512(loginValidate.password));
-            command.Parameters.AddWithValue("@_token", Funciones.getTokenSession());
 
-            return Conexion.execCommandSelect(command);
-
+            try
+            {
+                SqlCommand command = Conexion.commandSP("SPLoginCliente");
+                command.Parameters.AddWithValue("@_email", loginValidate.email);
+                command.Parameters.AddWithValue("@_password", Funciones.EncriptarSHA512(loginValidate.password));
+                command.Parameters.AddWithValue("@_token", Funciones.getTokenSession());
+                dt = Conexion.execCommandSelect(command);
+            }
+            catch (Exception ex)
+            {
+                excepcion.estado = false;
+                excepcion.message = "Ha ocurrido un error";
+                excepcion.errorMessage = ex.Message;
+                dt = Funciones.retornarException(excepcion);
+            }
+            return dt;
         }
     }
 }
