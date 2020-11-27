@@ -3,12 +3,14 @@
 /****************************************************************/
 
 
-
+use ShoppingCart;
 /*
 	Funcion Verificar el estado del token
 	Fecha Creacion 11/24/2020
 	Autor: Miguel Gongora
 */
+DROP FUNCTION VerificarEstadoToken
+
 CREATE FUNCTION VerificarEstadoToken	(
 											@_token NVARCHAR(256)
 										)
@@ -18,16 +20,18 @@ BEGIN
 	DECLARE @_Resultado				BIT,
 			@_fechaYHoraCreacion	DATETIME,
 			@_vigenciaMinutos		INT,
-			@_tiempoSinUso			DATETIME;
+			@_tiempoSinUso			INT;
 
-		SELECT @_fechaYHoraCreacion = t.fechaIngreso 
+		SELECT @_fechaYHoraCreacion = t.fechaIngreso
 		FROM TokenCliente t
 		WHERE token = @_token 
 		AND estado = 1;
 
-		SELECT @_vigenciaMinutos = CAST(valor AS INTEGER) 
-		FROM Parametros 
-		where id_parametro = 1;
+		SET @_fechaYHoraCreacion = ISNULL(@_fechaYHoraCreacion, '2001-01-01 01:01:01.001') 
+
+
+		SET @_vigenciaMinutos = 60
+		
 
 		SET @_tiempoSinUso = DATEDIFF(MINUTE, @_fechaYHoraCreacion, GETDATE());
 
@@ -43,5 +47,34 @@ BEGIN
 END
 
 
+CREATE PROC Sesion.SPActualizarVigenciaToken	(
+													@_token	NVARCHAR(250)
+												)
+AS
+BEGIN
+	--ELIMINAR TOKENS EXPIRADOS
+	DELETE TokenCliente
+	WHERE estado = 0
+
+	UPDATE	TokenCliente
+	SET		FechaIngreso				= GETDATE()
+	WHERE	token						= @_token
+			AND estado				= 1
+END
 
 
+
+
+
+
+
+
+
+SELECT * FROM TokenCliente;
+
+BEGIN
+	DECLARE @_valido BIT;
+
+	SELECT @_valido = dbo.VerificarEstadoToken('icM0EwULfvqlEASX6UjstJw6PhCMkGFHfGDMzo5JHI55mL53mhPgNbt0eawGpwiB4B8jDBiXiZapwwP4r4liCQKK');
+	SELECT @_valido
+END
