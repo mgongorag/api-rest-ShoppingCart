@@ -51,7 +51,6 @@ END
 	Autor: Miguel Gongora
 */
 
-DROP PROCEDURE SPRegistroCliente
 CREATE PROCEDURE SPRegistroCliente (
 									@_nombre			NVARCHAR(50),
 									@_apellido			NVARCHAR(50),
@@ -228,12 +227,10 @@ END
 	Fecha Creacion 11/22/2020
 	Autor: Miguel Gongora
 */
-
 CREATE PROCEDURE cambiarPassword (
-									@_idCliente		INT,
 									@_password		NVARCHAR(256),
-									@_nuevaPassword	NVARCHAR(256)
-
+									@_nuevaPassword	NVARCHAR(256),
+									@_token			NVARCHAR(256)
 								 )
 AS
 	DECLARE @_estado		BIT,
@@ -241,55 +238,78 @@ AS
 			@_codigoError	INT,
 			@_messageError	NVARCHAR(100),
 			@_filasAfectadas INT,
-			@_passwordDB	NVARCHAR(100);
+			@_passwordDB	NVARCHAR(100),
+			@_idCliente		INTEGER,
+			@_estadoToken	INTEGER;
 BEGIN
 	SET @_estado = 0;
-	
-	BEGIN TRANSACTION
+
+	SELECT @_idCliente = dbo.FNObtenerId(@_token);
+	SELECT @_estadoToken = dbo.VerificarEstadoToken(@_token);
+	-- ESTADO 0 = TokenExpirado
+	-- ESTADO 1 = TokenVigente
+	IF(@_estadoToken = 1)
+	BEGIN	
 		BEGIN TRY
-			SELECT @_passwordDB = password 
-			FROM CLIENTE 
-			WHERE id_cliente = @_idCliente;
+		BEGIN TRANSACTION
 
-			IF @_password = @_passwordDB
-				BEGIN
-					UPDATE Cliente
-					SET				password = @_nuevaPassword
-					WHERE id_cliente = @_idCliente;
+						SELECT @_passwordDB = password 
+						FROM CLIENTE 
+						WHERE id_cliente = @_idCliente;
+						IF @_password = @_passwordDB
+							BEGIN
+								UPDATE Cliente
+								SET				password = @_nuevaPassword
+								WHERE id_cliente = @_idCliente;
 
-					SET @_filasAfectadas = @@ROWCOUNT;
-				END
-			ELSE
-				BEGIN
-					SET @_estado = 0;
-					SET @_message = 'La contraseña es incorrecta';
-					SELECT @_estado AS Estado, @_message AS Message
-					ROLLBACK;
-				END
-		END TRY
-		BEGIN CATCH
-			SET @_messageError = ERROR_MESSAGE();
-			SET @_codigoError = ERROR_NUMBER();
-			SET @_message = 'Ha ocurrido un error, por favor intenta mas tarde.';
-			SET @_filasAfectadas = 0;
+								SET @_filasAfectadas = @@ROWCOUNT;
+							END
+						ELSE
+							BEGIN
+								SET @_estado = 0;
+								SET @_message = 'La contraseña no coincide con nuestros registros';
+								SELECT @_estado AS Estado, @_message AS Message
+								ROLLBACK;
+							END
+			END TRY
+			BEGIN CATCH
+				SET @_messageError = ERROR_MESSAGE();
+				SET @_codigoError = ERROR_NUMBER();
+				SET @_message = 'Ha ocurrido un error, por favor intenta mas tarde.';
+				SET @_filasAfectadas = 0;
 
-			SELECT	@_estado AS Estado, 
-						@_message AS Message, 
-						@_messageError AS Message_Error, 
-						@_codigoError AS Number_error;
-			ROLLBACK;
-		END CATCH
-
-		IF @_filasAfectadas > 0
-		BEGIN
-			SET @_estado = 1;
-				SET @_message = 'Contraseña actualizada exitosamente';
-				SELECT @_estado AS Estado, @_message AS Message, @_filasAfectadas AS Filas_Afectadas;
-				COMMIT;
+				SELECT	@_estado AS Estado, 
+							@_message AS Message, 
+							@_messageError AS Message_Error, 
+							@_codigoError AS Number_error;
+				ROLLBACK;
+			END CATCH;
+			IF @_filasAfectadas > 0
+			BEGIN
+				SET @_estado = 1;
+					SET @_message = 'Contraseña actualizada exitosamente';
+					SELECT @_estado AS Estado, @_message AS Message, @_filasAfectadas AS Filas_Afectadas;
+					COMMIT;
+			END
 		END
+		ELSE
+		BEGIN
+			SET @_message = 'Sesión expirada :(';
+			SET @_estado = 0
+			SELECT	@_estado as Estado,
+					@_message as Message;
+		END
+
+		
 END
 
+DROP PROCEDURE cambiarPassword
 
 
 
+SELECT * FROM TokenCliente;
 
+BEGIN
+	SELECT DBO.VerificarEstadoToken ('mSIFtThdg8GvbKKXcdZ6FwipA1aclFtkmfDNZhVbwKasQkQJcLgDFG2lbyELb1ccZtLA6oDKpakcQd1YN5eYPQKK');
+
+END
