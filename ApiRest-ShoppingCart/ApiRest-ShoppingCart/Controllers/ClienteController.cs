@@ -23,5 +23,18 @@ namespace ApiRest_ShoppingCart.Controllers
         {
             return Models.DataCliente.loginCliente(loginValidate);
         }
+        [HttpPost]
+        [Route("api/cambiarPassword")]
+        public DataTable cambiarPassword(DTO.DTOChangePassword changePassword)
+        {
+            return Models.DataCliente.cambiarPassword(changePassword);
+        }
+
+        [HttpPost]
+        [Route("api/guardarDatosEnvio")]
+        public DataTable guardarDatosEnvio(Entidades.DireccionEnvío direccionEnvio)
+        {
+            return Models.DataCliente.guardarDatosEnvio(direccionEnvio);
+        }
     }
 }

@@ -60,5 +60,53 @@ namespace ApiRest_ShoppingCart.Models
             }
             return dt;
         }
+
+        public static DataTable cambiarPassword(DTO.DTOChangePassword changePassword)
+        {
+
+            try
+            {
+                SqlCommand command = Conexion.commandSP("SPCambiarPassword");
+                command.Parameters.AddWithValue("@_password", Funciones.EncriptarSHA512(changePassword.password));
+                command.Parameters.AddWithValue("@_nuevaPassword", Funciones.EncriptarSHA512(changePassword.nuevaPassword));
+                command.Parameters.AddWithValue("@_token", changePassword.token);
+                command.Parameters.AddWithValue("@_idCliente", changePassword.idCliente);
+                dt = Conexion.execCommandSelect(command);
+
+            }
+            catch (Exception ex)
+            {
+                excepcion.estado = false;
+                excepcion.message = "Ha ocurrido un error";
+                excepcion.errorMessage = ex.Message;
+                dt = Funciones.retornarException(excepcion);
+            }
+            return dt;
+        }
+        
+        public static DataTable guardarDatosEnvio(Entidades.DireccionEnvío direccionEnvio)
+        {
+            try
+            {
+                SqlCommand command = Conexion.commandSP("SPGuardarDatosEnvio");
+                command.Parameters.AddWithValue("@_nombre", direccionEnvio.nombre);
+                command.Parameters.AddWithValue("@_direccion", direccionEnvio.direccion);
+                command.Parameters.AddWithValue("@_detalles", direccionEnvio.detalles);
+                command.Parameters.AddWithValue("@_idMunicipio", direccionEnvio.idMunicipio);
+                command.Parameters.AddWithValue("@_idCliente", direccionEnvio.idCliente);
+                command.Parameters.AddWithValue("@_token", direccionEnvio.token);
+
+                dt = Conexion.execCommandSelect(command);
+                
+            }
+            catch (Exception ex)
+            {
+                excepcion.estado = false;
+                excepcion.message = "Ha ocurrido un error";
+                excepcion.errorMessage = ex.Message;
+                dt = Funciones.retornarException(excepcion);
+            }
+            return dt;
+        }
     }
 }

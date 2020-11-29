@@ -228,9 +228,13 @@
     <Compile Include="Controllers\ClienteController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="DTO\DTOChangePassword.cs" />
     <Compile Include="Entidades\Cliente.cs" />
+    <Compile Include="Entidades\Departamento.cs" />
+    <Compile Include="Entidades\DireccionEnvío.cs" />
     <Compile Include="Entidades\Excepcion.cs" />
     <Compile Include="Entidades\LoginValidate.cs" />
+    <Compile Include="Entidades\Municipio.cs" />
     <Compile Include="Entidades\TokenSecurity.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -293,7 +297,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="DTO\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
