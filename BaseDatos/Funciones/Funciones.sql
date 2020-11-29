@@ -10,9 +10,9 @@ use ShoppingCart;
 	Autor: Miguel Gongora
 */
 DROP FUNCTION VerificarEstadoToken
-
 CREATE FUNCTION VerificarEstadoToken	(
-											@_token NVARCHAR(256)
+											@_token			NVARCHAR(256),
+											@_idCliente		INT
 										)
 RETURNS BIT
 AS 
@@ -24,8 +24,9 @@ BEGIN
 
 		SELECT @_fechaYHoraCreacion = t.fechaIngreso
 		FROM TokenCliente t
-		WHERE token = @_token 
-		AND estado = 1;
+		WHERE t.token = @_token
+		AND t.id_cliente = @_idCliente
+		AND t.estado = 1;
 
 		SET @_fechaYHoraCreacion = ISNULL(@_fechaYHoraCreacion, '2001-01-01 01:01:01.001') 
 
@@ -47,34 +48,39 @@ BEGIN
 END
 
 
-CREATE PROC Sesion.SPActualizarVigenciaToken	(
+CREATE PROC	SPActualizarVigenciaToken	(
 													@_token	NVARCHAR(250)
 												)
 AS
 BEGIN
-	--ELIMINAR TOKENS EXPIRADOS
-	DELETE TokenCliente
-	WHERE estado = 0
-
+	--Actualizar Token
 	UPDATE	TokenCliente
 	SET		FechaIngreso				= GETDATE()
 	WHERE	token						= @_token
-			AND estado				= 1
+			AND estado					= 1
 END
 
 
-
-
-
-
-
-
-
-SELECT * FROM TokenCliente;
-
+CREATE FUNCTION FNObtenerId(
+								@_token NVARCHAR(256)
+							) RETURNS INT
+AS
 BEGIN
-	DECLARE @_valido BIT;
+	DECLARE @_id_cliente INT;
+	SELECT  @_id_cliente = id_cliente
+	FROM TokenCliente
+	WHERE	token = @_token
+	AND		estado = 1;
 
-	SELECT @_valido = dbo.VerificarEstadoToken('icM0EwULfvqlEASX6UjstJw6PhCMkGFHfGDMzo5JHI55mL53mhPgNbt0eawGpwiB4B8jDBiXiZapwwP4r4liCQKK');
-	SELECT @_valido
+	RETURN ISNULL(@_id_cliente, 0);
+END
+
+CREATE PROCEDURE SPCambiarEstadoToken	(
+											@_token	NVARCHAR(256)
+										)
+AS
+BEGIN
+	UPDATE TokenCliente
+	SET estado = 0
+	WHERE token = @_token;
 END
