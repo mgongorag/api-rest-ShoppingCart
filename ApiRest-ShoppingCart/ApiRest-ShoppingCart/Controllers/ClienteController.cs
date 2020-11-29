@@ -35,6 +35,28 @@ namespace ApiRest_ShoppingCart.Controllers
         public DataTable guardarDatosEnvio(Entidades.DireccionEnvío direccionEnvio)
         {
             return Models.DataCliente.guardarDatosEnvio(direccionEnvio);
+        } 
+        
+        [HttpPost]
+        [Route("api/modificarDatosEnvio")]
+        public DataTable modificarDatosEnvio(Entidades.DireccionEnvío direccionEnvio)
+        {
+            return Models.DataCliente.modificarDatosEnvio(direccionEnvio);
         }
+
+        [HttpPost]
+        [Route("api/obtenerDireccionesEnvio")]
+        public DataTable obtenerDireccionesEnvio(Entidades.DireccionEnvío direccionEnvio)
+        {
+            return Models.DataCliente.obtenerDireccionesEnvio(direccionEnvio);
+        }
+
+        [HttpPost]
+        [Route("api/obtenerDireccionEnvio")]
+        public DataTable obtenerDireccionEnvio(Entidades.DireccionEnvío direccionEnvio)
+        {
+            return Models.DataCliente.obtenerDireccionEnvio(direccionEnvio);
+        }
+
     }
 }

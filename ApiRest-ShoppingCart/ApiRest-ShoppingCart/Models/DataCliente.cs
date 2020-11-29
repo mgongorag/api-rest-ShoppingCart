@@ -108,5 +108,73 @@ namespace ApiRest_ShoppingCart.Models
             }
             return dt;
         }
+
+        public static DataTable modificarDatosEnvio(Entidades.DireccionEnvío direccionEnvío)
+        {
+            try
+            {
+                SqlCommand command = Conexion.commandSP("SPModificarDireccionEnvio");
+                command.Parameters.AddWithValue("@_idDireccion", direccionEnvío.idDireccion);
+                command.Parameters.AddWithValue("@_nombre", direccionEnvío.nombre);
+                command.Parameters.AddWithValue("@_direccion", direccionEnvío.direccion);
+                command.Parameters.AddWithValue("@_detalles", direccionEnvío.detalles);
+                command.Parameters.AddWithValue("@_idMunicipio", direccionEnvío.idMunicipio);
+                command.Parameters.AddWithValue("@_idCliente", direccionEnvío.idCliente);
+                command.Parameters.AddWithValue("@_token", direccionEnvío.token);
+
+                dt = Conexion.execCommandSelect(command);
+            }
+            catch (Exception ex)
+            {
+                excepcion.estado = false;
+                excepcion.message = "Ha ocurrido un error";
+                excepcion.errorMessage = ex.Message;
+                dt = Funciones.retornarException(excepcion);
+            }
+            return dt;
+        }
+
+
+        public static DataTable obtenerDireccionesEnvio(Entidades.DireccionEnvío direccionEnvío)
+        {
+            try
+            {
+                SqlCommand command = Conexion.commandSP("SPObtenerDireccionesEnvio");
+                command.Parameters.AddWithValue("@_idCliente", direccionEnvío.idCliente);
+                command.Parameters.AddWithValue("@_token", direccionEnvío.token);
+                dt = Conexion.execCommandSelect(command);
+            }
+            catch (Exception ex)
+            {
+                excepcion.estado = false;
+                excepcion.message = "Ha ocurrido un error";
+                excepcion.errorMessage = ex.Message;
+                dt = Funciones.retornarException(excepcion);
+            }
+
+            return dt;
+        }
+
+        public static DataTable obtenerDireccionEnvio(Entidades.DireccionEnvío direccionEnvío)
+        {
+            try
+            {
+                SqlCommand command = Conexion.commandSP("SPObtenerDireccionEnvio");
+                command.Parameters.AddWithValue("@_idDireccion", direccionEnvío.idDireccion);
+                command.Parameters.AddWithValue("@_idCliente", direccionEnvío.idCliente);
+                command.Parameters.AddWithValue("@_token", direccionEnvío.token);
+
+                dt = Conexion.execCommandSelect(command);
+            }
+            catch (Exception ex)
+            {
+                excepcion.estado = false;
+                excepcion.message = "Ha ocurrido un error";
+                excepcion.errorMessage = ex.Message;
+                dt = Funciones.retornarException(excepcion);
+            }
+
+            return dt;
+        }
     }
 }
