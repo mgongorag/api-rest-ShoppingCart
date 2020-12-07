@@ -9,9 +9,8 @@ namespace ApiRest_ShoppingCart.Models
 {
     public class DataCliente
     {
-        private static Funciones function = new Funciones();
+    
         private static DataTable dt = new DataTable();
-        private static int estado = 0;
         private static Entidades.Excepcion excepcion = new Entidades.Excepcion();
 
         public static DataTable registrarUsuario(Entidades.Cliente cliente)
@@ -29,6 +28,12 @@ namespace ApiRest_ShoppingCart.Models
                 command.Parameters.AddWithValue("@_token", Funciones.getTokenSession());
 
                 dt = Conexion.execCommandSelect(command);
+                bool estado =  Convert.ToBoolean(dt.Rows[0]["Estado"].ToString());
+                if (estado)
+                {
+                    WsEmail.WsEmail.correoRegistro(cliente);
+                }
+
             }catch(Exception ex)
             {
                 excepcion.estado = false;

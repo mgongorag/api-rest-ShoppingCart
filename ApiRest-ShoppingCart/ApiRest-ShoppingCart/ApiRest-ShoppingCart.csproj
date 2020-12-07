@@ -243,6 +243,7 @@
     <Compile Include="Models\DataCliente.cs" />
     <Compile Include="Models\Funciones.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WsEmail\WsEmail.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />

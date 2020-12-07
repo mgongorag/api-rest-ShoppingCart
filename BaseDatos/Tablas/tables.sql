@@ -46,10 +46,11 @@ CREATE TABLE TokenCliente (
 CREATE TABLE DireccionesEnvio (
 	id_direccion	INT NOT NULL,
 	nombre			NVARCHAR(35) NOT NULL,
-	direccion		NVARCHAR(35) NOT NULL,
+	direccion		NVARCHAR(50) NOT NULL,
 	detalles		NVARCHAR(50),
 	id_municipio	SMALLINT NOT NULL,
 	id_cliente		INT NOT NULL,
+	estado			BIT DEFAULT 1,
 	CONSTRAINT id_direccionPK PRIMARY KEY (id_direccion),
 	FOREIGN KEY (id_municipio) REFERENCES Municipio(id_municipio),
 	FOREIGN KEY (id_cliente) REFERENCES Cliente(id_cliente)
@@ -64,3 +65,53 @@ CREATE TABLE Parametros(
 	CONSTRAINT id_parametroPK PRIMARY KEY (id_parametro)
 	)
 
+CREATE TABLE Categorias(
+	id_categoria	INT NOT NULL,
+	categoria		NVARCHAR(50) NOT NULL,
+	descripcion		NVARCHAR(100) NOT NULL
+	CONSTRAINT id_categoriaPK PRIMARY KEY(id_categoria)
+	)
+
+CREATE TABLE SubCategorias(
+	id_subCategoria	INT NOT NULL,
+	subCategoria	NVARCHAR(50) NOT NULL,
+	descripcion		NVARCHAR(100) NOT NULL
+	CONSTRAINT id_subCategoriaPK PRIMARY KEY(id_subCategoria),
+	FOREIGN KEY (id_subCategoria) REFERENCES Categorias (id_categoria)
+	)
+
+CREATE TABLE  Marca (
+	id_marca INT NOT NULL,
+	marca	 NVARCHAR(150) NOT NULL,
+	CONSTRAINT id_marcaPK PRIMARY KEY(id_marca)
+)
+
+CREATE TABLE Tienda (
+	id_tienda	INT NOT NULL,
+	nombre		NVARCHAR(100) NOT NULL,
+	eslogan		NVARCHAR(250) NOT NULL,
+	mision		NVARCHAR(250) NOT NULL,
+	vision		NVARCHAR(250) NOT NULL,
+	PRIMARY KEY (id_tienda)
+)
+
+CREATE TABLE Sucursales(
+	id_sucursal	INT NOT NULL,
+	sucursal	NVARCHAR(100) NOT NULL,
+	direccion	NVARCHAR(100) NOT NULL,
+	telefono	NVARCHAR(8) NOT NULL,
+	estado		BIT DEFAULT 1 NOT NULL,
+	id_tienda	INT NOT NULL,
+	PRIMARY KEY(id_sucursal),
+	FOREIGN KEY(id_tienda) REFERENCES Tienda(id_tienda)
+)
+
+CREATE TABLE Coordenada(
+	id_coordenada	INT NOT NULL,
+	altitud			DECIMAL(15,4) NOT NULL,
+	latitud			DECIMAL(15,4) NOT NULL,
+	id_sucursal		INT NOT NULL,
+	PRIMARY KEY (id_coordenada),
+	FOREIGN KEY (id_sucursal) REFERENCES Sucursales (id_sucursal)
+
+)
