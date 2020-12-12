@@ -143,9 +143,11 @@ CREATE TABLE Usuario (
 	ultimaSession	DATETIME NOT NULL,
 	id_puesto		INT NOT NULL,
 	id_sucursal		INT NOT NULL,
+	usuarioAgrega	int NOT NULL,
 	PRIMARY KEY (id_usuario),
 	FOREIGN KEY (id_puesto) REFERENCES Puesto (id_puesto),
-	FOREIGN KEY (id_sucursal) REFERENCES Sucursales(id_sucursal)
+	FOREIGN KEY (id_sucursal) REFERENCES Sucursales(id_sucursal),
+	FOREIGN KEY (usuarioAgrega) REFERENCES Usuario(id_usuario)
 	)
 
 CREATE TABLE TokenUsuario (
@@ -158,3 +160,24 @@ CREATE TABLE TokenUsuario (
 	PRIMARY KEY (id_token),
 	FOREIGN KEY (id_usuario) REFERENCES Usuario (id_usuario)
 )
+
+CREATE TABLE Pemisos (
+	id_permiso				INT NOT NULL,
+	actualizarInformacion	BIT NOT NULL,
+	agregarUsuarios			BIT NOT NULL,
+	actualizarUsuarios		BIT NOT NULL,
+	agregarProductos		BIT NOT NULL,
+	confirmarVenta			BIT NOT NULL,
+	verVenta				BIT NOT NULL,
+	verSaldos				BIT NOT NULL,
+	verInventario			BIT NOT NULL,
+	actualizarInventario	BIT NOT NULL,
+	procesarCompra			BIT NOT NULL,
+	eliminarCompra			BIT NOT NULL,
+	actualizarCompra		BIT NOT NULL,
+	agregarCuentas			BIT NOT NULL,
+	cambiarPassword			BIT NOT NULL,
+	id_usuario				INT FOREIGN KEY REFERENCES Usuario(id_usuario)
+)
+
+
