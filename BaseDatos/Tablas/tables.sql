@@ -115,3 +115,46 @@ CREATE TABLE Coordenada(
 	FOREIGN KEY (id_sucursal) REFERENCES Sucursales (id_sucursal)
 
 )
+
+CREATE TABLE DepartamentoEmpresa (
+	id_departamento	INT NOT NULL,
+	departamento	NVARCHAR(50) NOT NULL,
+	estado			BIT,
+	PRIMARY KEY (id_departamento)
+)
+
+CREATE TABLE Puesto  (
+id_puesto	INT NOT NULL,
+puesto		NVARCHAR(50) NOT NULL,
+descripcion	NVARCHAR(100) NOT NULL,
+estado		BIT,
+id_departamento INT NOT NULL,
+PRIMARY KEY (id_puesto),
+FOREIGN KEY (id_departamento) REFERENCES DepartamentoEmpresa(id_departamento)
+)
+
+CREATE TABLE Usuario (
+	id_usuario		INT NOT NULL,
+	nombre			NVARCHAR(50) NOT NULL,
+	apellido		NVARCHAR(50) NOT NULL,
+	dpi				NVARCHAR(13) NOT NULL,
+	cumpleanio		DATE NOT NULL,
+	fechaIngreso	DATE NOT NULL,
+	ultimaSession	DATETIME NOT NULL,
+	id_puesto		INT NOT NULL,
+	id_sucursal		INT NOT NULL,
+	PRIMARY KEY (id_usuario),
+	FOREIGN KEY (id_puesto) REFERENCES Puesto (id_puesto),
+	FOREIGN KEY (id_sucursal) REFERENCES Sucursales(id_sucursal)
+	)
+
+CREATE TABLE TokenUsuario (
+	id_token		INT NOT NULL,
+	token			NVARCHAR(256) NOT NULL,
+	expiracion		SMALLINT NOT NULL,
+	id_usuario		INT NOT NULL,
+	fechaIngreso	DATETIME NOT NULL,
+	estado			BIT NOT NULL,
+	PRIMARY KEY (id_token),
+	FOREIGN KEY (id_usuario) REFERENCES Usuario (id_usuario)
+)
