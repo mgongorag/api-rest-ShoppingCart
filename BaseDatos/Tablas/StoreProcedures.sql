@@ -294,14 +294,14 @@ BEGIN
 					COMMIT;
 			END
 		END
-		ELSE
-		BEGIN
-			EXEC SPCambiarEstadoToken @_token;
-			SET @_message = 'Sesión expirada :(';
-			SET @_estado = 0
-			SELECT	@_estado as Estado,
-					@_message as Message;
-		END	
+	ELSE
+	BEGIN
+		EXEC SPCambiarEstadoToken @_token;
+		SET @_message = 'Sesión expirada :(';
+		SET @_estado = 0
+		SELECT	@_estado as Estado,
+				@_message as Message;
+	END	
 END
 
 /*

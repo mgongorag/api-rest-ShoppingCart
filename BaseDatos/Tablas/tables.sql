@@ -161,7 +161,7 @@ CREATE TABLE TokenUsuario (
 	FOREIGN KEY (id_usuario) REFERENCES Usuario (id_usuario)
 )
 
-CREATE TABLE Pemisos (
+CREATE TABLE Permisos (
 	id_permiso				INT NOT NULL,
 	actualizarInformacion	BIT NOT NULL,
 	agregarUsuarios			BIT NOT NULL,
@@ -179,5 +179,6 @@ CREATE TABLE Pemisos (
 	cambiarPassword			BIT NOT NULL,
 	id_usuario				INT FOREIGN KEY REFERENCES Usuario(id_usuario)
 )
+
 
 
